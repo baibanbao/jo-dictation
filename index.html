@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小Jo英语默写</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f3ea;
+      --panel: #ffffff;
+      --ink: #202124;
+      --muted: #6c6f76;
+      --line: #ded7c8;
+      --green: #197a51;
+      --green-soft: #e5f3ed;
+      --red: #b7382f;
+      --red-soft: #fae8e5;
+      --blue: #1f5f9f;
+      --blue-soft: #e6eef9;
+      --yellow: #fff5d6;
+      --shadow: 0 16px 50px rgba(32, 33, 36, 0.08);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(247, 243, 234, 0.85)),
+        radial-gradient(circle at 12% 6%, rgba(31, 95, 159, 0.12), transparent 32%),
+        radial-gradient(circle at 86% 8%, rgba(25, 122, 81, 0.12), transparent 30%),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 38px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: #203b2d;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0;
+      flex: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .practice {
+      padding: 20px;
+      min-height: 650px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 0.9fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    select,
+    input {
+      min-height: 44px;
+      padding: 0 12px;
+    }
+
+    textarea {
+      min-height: 112px;
+      padding: 10px 12px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(31, 95, 159, 0.13);
+    }
+
+    .btn {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: 8px;
+      color: #fff;
+      background: var(--ink);
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--green);
+    }
+
+    .btn.blue {
+      background: var(--blue);
+    }
+
+    .btn.red {
+      background: var(--red);
+    }
+
+    .btn.light {
+      color: var(--ink);
+      background: #f1eadf;
+      border: 1px solid var(--line);
+    }
+
+    .btn.icon {
+      min-width: 44px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: #fbfaf7;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 330px;
+      border: 1px dashed #cabfae;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fffdf8, #faf6ee);
+      padding: 26px;
+      text-align: center;
+    }
+
+    .unitline {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .meaning {
+      margin: 0 auto 18px;
+      max-width: 680px;
+      font-size: clamp(22px, 4vw, 42px);
+      line-height: 1.25;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .typechip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: #17426e;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    #answerInput {
+      min-height: 58px;
+      font-size: clamp(22px, 4vw, 34px);
+      text-align: center;
+      font-weight: 750;
+      letter-spacing: 0;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .feedback {
+      min-height: 72px;
+      max-width: 720px;
+      margin: 18px auto 0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      text-align: left;
+      border: 1px solid transparent;
+      background: #fff;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .feedback.correct {
+      color: #12583b;
+      border-color: #9bd1bc;
+      background: var(--green-soft);
+    }
+
+    .feedback.wrong {
+      color: #8d2d26;
+      border-color: #e6aaa4;
+      background: var(--red-soft);
+    }
+
+    .feedback.hint {
+      color: #73560b;
+      border-color: #efd687;
+      background: var(--yellow);
+    }
+
+    .bottom-tools {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toggles {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .checkline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .checkline input {
+      width: 18px;
+      height: 18px;
+      min-height: 18px;
+      accent-color: var(--green);
+    }
+
+    .side {
+      display: grid;
+      gap: 16px;
+    }
+
+    .box {
+      padding: 16px;
+    }
+
+    .box h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .row {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+      max-height: 330px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #fffefa;
+    }
+
+    .item strong {
+      display: block;
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+    }
+
+    .delete {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      color: var(--red);
+      background: var(--red-soft);
+      font-weight: 800;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 10px 0 0;
+    }
+
+    .empty {
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fffefa;
+      line-height: 1.5;
+    }
+
+    .kbd {
+      border: 1px solid #cfc7b6;
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      padding: 1px 6px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .practice {
+        min-height: auto;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100% - 18px, 1180px);
+        padding-top: 12px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .practice,
+      .box {
+        padding: 12px;
+      }
+
+      .controls,
+      .answer-row,
+      .two,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        min-height: 300px;
+        padding: 18px 12px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .actions .btn {
+        flex: 1 1 140px;
+      }
+
+      .btn.icon {
+        width: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">Jo</div>
+        <div>
+          <h1>小Jo英语默写</h1>
+          <p class="subtitle">听发音，打答案，答不上来再看提示。</p>
+        </div>
+      </div>
+      <button class="btn light" id="resetBuiltinsBtn" type="button" title="恢复内置练习内容">恢复内置</button>
+    </header>
+
+    <div class="layout">
+      <section class="panel practice" aria-label="默写练习">
+        <div class="controls">
+          <div class="field">
+            <label for="unitFilter">练习范围</label>
+            <select id="unitFilter"></select>
+          </div>
+          <div class="field">
+            <label for="orderMode">顺序</label>
+            <select id="orderMode">
+              <option value="shuffle">打乱</option>
+              <option value="inOrder">按列表</option>
+              <option value="wrongOnly">只练错题</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="voiceSelect">发音</label>
+            <select id="voiceSelect"></select>
+          </div>
+          <button class="btn blue" id="newRoundBtn" type="button">开始一轮</button>
+        </div>
+
+        <div class="stats" aria-live="polite">
+          <div class="stat"><b id="doneCount">0</b><span>已做</span></div>
+          <div class="stat"><b id="rightCount">0</b><span>正确</span></div>
+          <div class="stat"><b id="wrongCount">0</b><span>错题</span></div>
+          <div class="stat"><b id="leftCount">0</b><span>剩余</span></div>
+        </div>
+
+        <div class="stage">
+          <div class="unitline" id="unitLine">准备开始</div>
+          <p class="meaning" id="meaningText">选择范围后点“开始一轮”</p>
+          <div class="typechip" id="typeChip">单词 / 短语</div>
+          <div class="answer-row">
+            <input id="answerInput" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="在这里输入英文">
+            <button class="btn icon primary" id="speakBtn" type="button" title="播放发音">▶</button>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="checkBtn" type="button">检查</button>
+            <button class="btn light" id="hintBtn" type="button">提示第一个词</button>
+            <button class="btn light" id="showBtn" type="button">看答案</button>
+            <button class="btn blue" id="nextBtn" type="button">下一题</button>
+          </div>
+          <div class="feedback" id="feedback">提示：按 <span class="kbd">Enter</span> 检查；按 <span class="kbd">⌘/Ctrl + Enter</span> 播放发音。</div>
+        </div>
+
+        <div class="bottom-tools">
+          <div class="toggles">
+            <label class="checkline"><input id="showChinese" type="checkbox" checked> 显示中文意思</label>
+            <label class="checkline"><input id="autoSpeak" type="checkbox" checked> 下一题自动读</label>
+            <label class="checkline"><input id="strictMode" type="checkbox"> 严格标点</label>
+          </div>
+          <button class="btn light" id="exportBtn" type="button">导出我的词表</button>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="panel box" aria-label="添加内容">
+          <h2>手动添加</h2>
+          <div class="row">
+            <label for="newEnglish">英文单词或短语</label>
+            <input id="newEnglish" type="text" placeholder="例：make a good impression on">
+          </div>
+          <div class="row">
+            <label for="newChinese">中文提示</label>
+            <input id="newChinese" type="text" placeholder="例：给……留下好印象">
+          </div>
+          <div class="two">
+            <div class="row">
+              <label for="newUnit">单元</label>
+              <input id="newUnit" type="text" value="我的词表">
+            </div>
+            <div class="row">
+              <label for="newType">类型</label>
+              <select id="newType">
+                <option value="word">单词</option>
+                <option value="phrase">短语</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn primary" id="addBtn" type="button">添加到练习</button>
+          <p class="note">新增内容会保存在本机浏览器里，不会上传。</p>
+        </section>
+
+        <section class="panel box" aria-label="批量导入">
+          <h2>批量导入</h2>
+          <textarea id="bulkInput" placeholder="一行一个：
+raise = 筹募
+body language = 肢体语言
+take place = 发生"></textarea>
+          <button class="btn blue" id="bulkBtn" type="button">导入这些行</button>
+          <p class="note">支持 “英文 = 中文” 或 “英文 - 中文”。导入时会自动判断单词或短语。</p>
+        </section>
+
+        <section class="panel box" aria-label="当前词表">
+          <h2>当前词表</h2>
+          <div class="list" id="itemList"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "joDictationItems.v1";
+    const WRONG_KEY = "joDictationWrongIds.v1";
+
+    const builtInItems = [
+      { id: "u1-raise", unit: "Unit 1 Helping those in need", type: "word", text: "raise", cn: "筹募；提高" },
+      { id: "u1-permission", unit: "Unit 1 Helping those in need", type: "word", text: "permission", cn: "准许；许可" },
+      { id: "u1-disabled", unit: "Unit 1 Helping those in need", type: "word", text: "disabled", cn: "有残疾的" },
+      { id: "u1-teenager", unit: "Unit 1 Helping those in need", type: "word", text: "teenager", cn: "青少年" },
+      { id: "u1-offer", unit: "Unit 1 Helping those in need", type: "word", text: "offer", cn: "提供；主动提出" },
+      { id: "u1-suffer", unit: "Unit 1 Helping those in need", type: "word", text: "suffer", cn: "受苦；经受" },
+      { id: "u1-illness", unit: "Unit 1 Helping those in need", type: "word", text: "illness", cn: "疾病" },
+      { id: "u1-organize", unit: "Unit 1 Helping those in need", type: "word", text: "organize", cn: "组织；筹备", variants: ["organise"] },
+      { id: "u1-lonely", unit: "Unit 1 Helping those in need", type: "word", text: "lonely", cn: "孤独的" },
+      { id: "u1-friendship", unit: "Unit 1 Helping those in need", type: "word", text: "friendship", cn: "友谊" },
+      { id: "u1-in-need", unit: "Unit 1 Helping those in need", type: "phrase", text: "in need", cn: "需要帮助的" },
+      { id: "u1-voluntary-work", unit: "Unit 1 Helping those in need", type: "phrase", text: "voluntary work", cn: "志愿工作" },
+      { id: "u1-ask-permission", unit: "Unit 1 Helping those in need", type: "phrase", text: "ask permission", cn: "请求许可" },
+      { id: "u1-in-order-to", unit: "Unit 1 Helping those in need", type: "phrase", text: "in order to", cn: "为了；以便" },
+      { id: "u2-communication", unit: "Unit 2 Body language", type: "word", text: "communication", cn: "交流；沟通" },
+      { id: "u2-accept", unit: "Unit 2 Body language", type: "word", text: "accept", cn: "接受" },
+      { id: "u2-reject", unit: "Unit 2 Body language", type: "word", text: "reject", cn: "拒绝接受" },
+      { id: "u2-gesture", unit: "Unit 2 Body language", type: "word", text: "gesture", cn: "手势" },
+      { id: "u2-message", unit: "Unit 2 Body language", type: "word", text: "message", cn: "信息；消息" },
+      { id: "u2-bored", unit: "Unit 2 Body language", type: "word", text: "bored", cn: "厌烦的；无聊的" },
+      { id: "u2-expression", unit: "Unit 2 Body language", type: "word", text: "expression", cn: "表情；表达" },
+      { id: "u2-appearance", unit: "Unit 2 Body language", type: "word", text: "appearance", cn: "外貌；出现" },
+      { id: "u2-impression", unit: "Unit 2 Body language", type: "word", text: "impression", cn: "印象" },
+      { id: "u2-towards", unit: "Unit 2 Body language", type: "word", text: "towards", cn: "朝；向" },
+      { id: "u2-remind", unit: "Unit 2 Body language", type: "word", text: "remind", cn: "提醒" },
+      { id: "u2-body-language", unit: "Unit 2 Body language", type: "phrase", text: "body language", cn: "肢体语言" },
+      { id: "u2-take-place", unit: "Unit 2 Body language", type: "phrase", text: "take place", cn: "发生；进行" },
+      { id: "u2-sit-up", unit: "Unit 2 Body language", type: "phrase", text: "sit up", cn: "坐直；坐起来" },
+      { id: "u2-make-a-good-impression-on", unit: "Unit 2 Body language", type: "phrase", text: "make a good impression on", cn: "给……留下好印象" },
+      { id: "u3-description", unit: "Unit 3 Traditional skills", type: "word", text: "description", cn: "描述；说明" },
+      { id: "u3-fisherman", unit: "Unit 3 Traditional skills", type: "word", text: "fisherman", cn: "渔民" },
+      { id: "u3-net", unit: "Unit 3 Traditional skills", type: "word", text: "net", cn: "网" },
+      { id: "u3-although", unit: "Unit 3 Traditional skills", type: "word", text: "although", cn: "虽然；尽管" },
+      { id: "u3-cormorant", unit: "Unit 3 Traditional skills", type: "word", text: "cormorant", cn: "鸬鹚" },
+      { id: "u3-attract", unit: "Unit 3 Traditional skills", type: "word", text: "attract", cn: "吸引" },
+      { id: "u3-require", unit: "Unit 3 Traditional skills", type: "word", text: "require", cn: "需要；要求" },
+      { id: "u3-practise", unit: "Unit 3 Traditional skills", type: "word", text: "practise", cn: "从事；练习", variants: ["practice"] },
+      { id: "u3-scissors", unit: "Unit 3 Traditional skills", type: "word", text: "scissors", cn: "剪刀" },
+      { id: "u3-pattern", unit: "Unit 3 Traditional skills", type: "word", text: "pattern", cn: "图案；模式" },
+      { id: "ocr-b-choose-clothes-for-her-singing-performance", unit: "Unit 4 Fashion", type: "phrase", text: "choose clothes for her singing performance", cn: "为她的歌唱表演挑选衣服" },
+      { id: "ocr-b-have-something-particular-in-mind", unit: "Unit 4 Fashion", type: "phrase", text: "have something particular in mind", cn: "心里有特别的想法" },
+      { id: "ocr-b-comfortable-clothes-like-sportswear", unit: "Unit 4 Fashion", type: "phrase", text: "comfortable clothes like sportswear", cn: "像运动服一样舒适的衣服" },
+      { id: "ocr-b-not-work-for-my-performance", unit: "Unit 4 Fashion", type: "phrase", text: "not work for my performance", cn: "不适合我的表演" },
+      { id: "ocr-b-need-something-fashionable-for-the-show", unit: "Unit 4 Fashion", type: "phrase", text: "need something fashionable for the show", cn: "演出需要一些时髦的东西" },
+      { id: "ocr-b-a-polka-dot-dress", unit: "Unit 4 Fashion", type: "phrase", text: "a polka dot dress", cn: "一条波点连衣裙" },
+      { id: "ocr-b-i-love-the-pattern", unit: "Unit 4 Fashion", type: "phrase", text: "I love the pattern", cn: "我喜欢这个图案" },
+      { id: "ocr-b-look-great-in-it", unit: "Unit 4 Fashion", type: "phrase", text: "look great in it", cn: "穿上它看起来很棒" },
+      { id: "ocr-b-bring-out-the-best-of-you", unit: "Unit 4 Fashion", type: "phrase", text: "bring out the best of you", cn: "展现出你最好的一面" },
+      { id: "ocr-b-as-beautiful-as-the-song-youll-be-singing", unit: "Unit 4 Fashion", type: "phrase", text: "as beautiful as the song you'll be singing", cn: "和你将要唱的歌一样美" },
+      { id: "ocr-b-tell-the-truth", unit: "Unit 4 Fashion", type: "phrase", text: "tell the truth", cn: "说实话" },
+      { id: "ocr-b-dark-suit-jacket-with-a-bow-tie", unit: "Unit 4 Fashion", type: "phrase", text: "dark suit jacket with a bow tie", cn: "配领结的深色西装外套" },
+      { id: "ocr-b-black-dress-with-white-polka-dots", unit: "Unit 4 Fashion", type: "phrase", text: "black dress with white polka dots", cn: "带白色波点的黑色连衣裙" },
+      { id: "ocr-b-flowery-shirt", unit: "Unit 4 Fashion", type: "phrase", text: "flowery shirt", cn: "印花衬衫" },
+      { id: "ocr-b-folk-dance-dress", unit: "Unit 4 Fashion", type: "phrase", text: "folk dance dress", cn: "民族舞服装" },
+      { id: "ocr-b-street-dance-outfit", unit: "Unit 4 Fashion", type: "phrase", text: "street dance outfit", cn: "街舞服装" },
+      { id: "ocr-c-changing-fashion", unit: "Unit 4 Fashion", type: "phrase", text: "changing fashion", cn: "变化中的时尚" },
+      { id: "ocr-c-the-truth-behind-fashion-changes", unit: "Unit 4 Fashion", type: "phrase", text: "the truth behind fashion changes", cn: "时尚变化背后的真相" },
+      { id: "ocr-c-hard-to-keep-up", unit: "Unit 4 Fashion", type: "phrase", text: "try to keep up", cn: "努力跟上（潮流）" },
+      { id: "ocr-c-wear-the-latest-fashions", unit: "Unit 4 Fashion", type: "phrase", text: "wear the latest fashions", cn: "穿最新潮流" },
+      { id: "ocr-c-decide-what-is-fashionable", unit: "Unit 4 Fashion", type: "phrase", text: "decide what is fashionable", cn: "决定什么是时髦的" },
+      { id: "ocr-c-one-influence-on-fashion", unit: "Unit 4 Fashion", type: "phrase", text: "one influence on fashion", cn: "对时尚的一种影响" },
+      { id: "ocr-c-spend-money-advertising-their-products", unit: "Unit 4 Fashion", type: "phrase", text: "spend money on advertising", cn: "花钱做广告" },
+      { id: "ocr-c-in-outdoor-advertisements", unit: "Unit 4 Fashion", type: "phrase", text: "in outdoor advertisements", cn: "在户外广告里" },
+      { id: "ocr-c-images-of-beautiful-people", unit: "Unit 4 Fashion", type: "phrase", text: "images of beautiful people", cn: "美丽人物的形象" },
+      { id: "ocr-c-live-an-exciting-life", unit: "Unit 4 Fashion", type: "phrase", text: "live an exciting life", cn: "过着令人兴奋的生活" },
+      { id: "ocr-c-influence-our-thoughts", unit: "Unit 4 Fashion", type: "phrase", text: "influence our thoughts", cn: "影响我们的想法" },
+      { id: "ocr-c-the-truth-behind-advertising", unit: "Unit 4 Fashion", type: "phrase", text: "the truth behind advertising", cn: "广告背后的真相" },
+      { id: "ocr-c-popular-culture", unit: "Unit 4 Fashion", type: "phrase", text: "popular culture", cn: "流行文化" },
+      { id: "ocr-c-social-media-influencers", unit: "Unit 4 Fashion", type: "phrase", text: "social media influencers", cn: "社交媒体网红" },
+      { id: "ocr-c-look-for-new-ways-to-attract-attention", unit: "Unit 4 Fashion", type: "phrase", text: "find new ways to attract attention", cn: "找新办法吸引注意" },
+      { id: "ocr-c-follow-their-style", unit: "Unit 4 Fashion", type: "phrase", text: "follow their style", cn: "跟随他们的风格" },
+      { id: "ocr-c-wear-them-with-confidence", unit: "Unit 4 Fashion", type: "phrase", text: "wear them with confidence", cn: "自信地穿戴" },
+      { id: "ocr-c-create-your-own-personal-style", unit: "Unit 4 Fashion", type: "phrase", text: "create your own personal style", cn: "打造你自己的个人风格" },
+      { id: "ocr-c-be-dressed-in-expensive-clothes", unit: "Unit 4 Fashion", type: "phrase", text: "be dressed in expensive clothes", cn: "穿着昂贵的衣服" },
+      { id: "ocr-c-spend-money-on-fashion", unit: "Unit 4 Fashion", type: "phrase", text: "spend money on fashion", cn: "在时尚上花钱" },
+      { id: "ocr-c-fashion-pioneers", unit: "Unit 4 Fashion", type: "phrase", text: "fashion pioneers", cn: "时尚先锋" },
+      { id: "ocr-c-be-paid-to-wear-fashionable-jewellery", unit: "Unit 4 Fashion", type: "phrase", text: "be paid to wear fashionable jewellery", cn: "被付钱戴时髦的珠宝", variants: ["be paid to wear fashionable jewelry"] },
+      { id: "ocr-c-as-a-result", unit: "Unit 4 Fashion", type: "phrase", text: "as a result", cn: "结果；因此" },
+      { id: "ocr-c-they-are-so-blind-that-they-dont-realize", unit: "Unit 4 Fashion", type: "phrase", text: "they are so blind that they don't realize", cn: "他们如此盲目以至于没意识到" },
+      { id: "ocr-c-as-long-as-you-feel-comfortable-in-them", unit: "Unit 4 Fashion", type: "phrase", text: "as long as you feel comfortable in them", cn: "只要你穿着舒服" }
+    ];
+
+    let items = loadItems();
+    let wrongIds = new Set(readJson(WRONG_KEY, []));
+    let queue = [];
+    let currentIndex = -1;
+    let answered = false;
+    let roundStats = { right: 0, wrong: 0 };
+    let voices = [];
+
+    const els = {
+      unitFilter: document.querySelector("#unitFilter"),
+      orderMode: document.querySelector("#orderMode"),
+      voiceSelect: document.querySelector("#voiceSelect"),
+      newRoundBtn: document.querySelector("#newRoundBtn"),
+      resetBuiltinsBtn: document.querySelector("#resetBuiltinsBtn"),
+      doneCount: document.querySelector("#doneCount"),
+      rightCount: document.querySelector("#rightCount"),
+      wrongCount: document.querySelector("#wrongCount"),
+      leftCount: document.querySelector("#leftCount"),
+      unitLine: document.querySelector("#unitLine"),
+      meaningText: document.querySelector("#meaningText"),
+      typeChip: document.querySelector("#typeChip"),
+      answerInput: document.querySelector("#answerInput"),
+      speakBtn: document.querySelector("#speakBtn"),
+      checkBtn: document.querySelector("#checkBtn"),
+      hintBtn: document.querySelector("#hintBtn"),
+      showBtn: document.querySelector("#showBtn"),
+      nextBtn: document.querySelector("#nextBtn"),
+      feedback: document.querySelector("#feedback"),
+      showChinese: document.querySelector("#showChinese"),
+      autoSpeak: document.querySelector("#autoSpeak"),
+      strictMode: document.querySelector("#strictMode"),
+      exportBtn: document.querySelector("#exportBtn"),
+      newEnglish: document.querySelector("#newEnglish"),
+      newChinese: document.querySelector("#newChinese"),
+      newUnit: document.querySelector("#newUnit"),
+      newType: document.querySelector("#newType"),
+      addBtn: document.querySelector("#addBtn"),
+      bulkInput: document.querySelector("#bulkInput"),
+      bulkBtn: document.querySelector("#bulkBtn"),
+      itemList: document.querySelector("#itemList")
+    };
+
+    init();
+
+    function init() {
+      renderFilters();
+      renderList();
+      loadVoices();
+      bindEvents();
+      startRound();
+    }
+
+    function bindEvents() {
+      els.newRoundBtn.addEventListener("click", startRound);
+      els.unitFilter.addEventListener("change", startRound);
+      els.orderMode.addEventListener("change", startRound);
+      els.speakBtn.addEventListener("click", () => speak(currentItem()?.text));
+      els.checkBtn.addEventListener("click", checkAnswer);
+      els.hintBtn.addEventListener("click", showHint);
+      els.showBtn.addEventListener("click", showAnswer);
+      els.nextBtn.addEventListener("click", nextItem);
+      els.showChinese.addEventListener("change", renderCurrent);
+      els.addBtn.addEventListener("click", addSingle);
+      els.bulkBtn.addEventListener("click", addBulk);
+      els.exportBtn.addEventListener("click", exportItems);
+      els.resetBuiltinsBtn.addEventListener("click", resetBuiltins);
+      els.answerInput.addEventListener("keydown", (event) => {
+        if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+          event.preventDefault();
+          speak(currentItem()?.text);
+          return;
+        }
+        if (event.key === "Enter") {
+          event.preventDefault();
+          checkAnswer();
+        }
+      });
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+
+    function loadItems() {
+      const saved = readJson(STORAGE_KEY, null);
+      if (!Array.isArray(saved) || saved.length === 0) {
+        return builtInItems.slice();
+      }
+      const retiredBuiltInIds = new Set([
+        "ocr-c-a-better-way-to-think-about",
+        "ocr-c-have-your-own-style",
+        "ocr-c-the-effect-of-culture"
+      ]);
+      const builtInById = new Map(builtInItems.map((item) => [item.id, item]));
+      const upgradedSaved = saved
+        .filter((item) => !retiredBuiltInIds.has(item.id))
+        .map((item) => builtInById.get(item.id) || item);
+      const savedIds = new Set(upgradedSaved.map((item) => item.id));
+      const missingBuiltIns = builtInItems.filter((item) => !savedIds.has(item.id));
+      return [...upgradedSaved, ...missingBuiltIns];
+    }
+
+    function readJson(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveItems() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      renderFilters();
+      renderList();
+    }
+
+    function saveWrongIds() {
+      localStorage.setItem(WRONG_KEY, JSON.stringify([...wrongIds]));
+    }
+
+    function renderFilters() {
+      const selected = els.unitFilter.value || "all";
+      const units = [...new Set(items.map((item) => item.unit || "我的词表"))];
+      const options = [
+        `<option value="all">全部内容（${items.length}）</option>`,
+        ...units.map((unit) => {
+          const count = items.filter((item) => item.unit === unit).length;
+          return `<option value="${escapeAttr(unit)}">${escapeHtml(unit)}（${count}）</option>`;
+        })
+      ];
+      els.unitFilter.innerHTML = options.join("");
+      if ([...els.unitFilter.options].some((option) => option.value === selected)) {
+        els.unitFilter.value = selected;
+      }
+    }
+
+    function renderList() {
+      if (!items.length) {
+        els.itemList.innerHTML = `<div class="empty">现在没有词。请先添加或恢复内置内容。</div>`;
+        return;
+      }
+
+      els.itemList.innerHTML = items.map((item) => `
+        <div class="item">
+          <div>
+            <strong>${escapeHtml(item.text)}</strong>
+            <span>${escapeHtml(item.cn || "无中文提示")} · ${escapeHtml(item.unit || "我的词表")}</span>
+          </div>
+          <button class="delete" type="button" title="删除" data-delete="${escapeAttr(item.id)}">×</button>
+        </div>
+      `).join("");
+
+      els.itemList.querySelectorAll("[data-delete]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const id = button.getAttribute("data-delete");
+          items = items.filter((item) => item.id !== id);
+          wrongIds.delete(id);
+          saveWrongIds();
+          saveItems();
+          startRound();
+        });
+      });
+    }
+
+    function startRound() {
+      const unit = els.unitFilter.value || "all";
+      const mode = els.orderMode.value;
+      let selected = items.filter((item) => unit === "all" || item.unit === unit);
+
+      if (mode === "wrongOnly") {
+        selected = selected.filter((item) => wrongIds.has(item.id));
+      }
+      if (mode === "shuffle") {
+        selected = shuffle(selected);
+      }
+
+      queue = selected;
+      currentIndex = queue.length ? 0 : -1;
+      answered = false;
+      roundStats = { right: 0, wrong: 0 };
+      renderCurrent();
+      updateStats();
+      if (queue.length && els.autoSpeak.checked) {
+        setTimeout(() => speak(currentItem().text), 250);
+      }
+    }
+
+    function currentItem() {
+      return queue[currentIndex] || null;
+    }
+
+    function renderCurrent() {
+      const item = currentItem();
+      els.answerInput.value = "";
+      answered = false;
+      clearFeedback();
+
+      if (!item) {
+        els.unitLine.textContent = "没有可练内容";
+        els.meaningText.textContent = els.orderMode.value === "wrongOnly" ? "现在没有错题" : "请先添加内容";
+        els.typeChip.textContent = "空";
+        setDisabled(true);
+        updateStats();
+        return;
+      }
+
+      setDisabled(false);
+      els.unitLine.textContent = `${item.unit || "我的词表"} · 第 ${currentIndex + 1} / ${queue.length} 题`;
+      els.meaningText.textContent = els.showChinese.checked ? (item.cn || "听发音写英文") : "听发音写英文";
+      els.typeChip.textContent = item.type === "phrase" ? "短语" : "单词";
+      els.answerInput.focus();
+      updateStats();
+    }
+
+    function setDisabled(disabled) {
+      [els.answerInput, els.speakBtn, els.checkBtn, els.hintBtn, els.showBtn, els.nextBtn].forEach((el) => {
+        el.disabled = disabled;
+      });
+    }
+
+    function checkAnswer() {
+      const item = currentItem();
+      if (!item) return;
+
+      const input = els.answerInput.value;
+      if (!input.trim()) {
+        setFeedback("hint", "先听一遍，再把英文打出来。不会就点“提示第一个词”。");
+        return;
+      }
+
+      const answers = [item.text, ...(item.variants || [])];
+      const ok = answers.some((answer) => normalize(answer) === normalize(input));
+
+      if (ok) {
+        setFeedback("correct", `对了：${item.text}`);
+        if (!answered) {
+          roundStats.right += 1;
+          wrongIds.delete(item.id);
+          saveWrongIds();
+        }
+      } else {
+        setFeedback("wrong", `还不对。你写的是 “${input.trim()}”。再听一遍，或看第一个词提示。`);
+        if (!answered) {
+          roundStats.wrong += 1;
+          wrongIds.add(item.id);
+          saveWrongIds();
+        }
+      }
+      answered = true;
+      updateStats();
+    }
+
+    function showHint() {
+      const item = currentItem();
+      if (!item) return;
+      const words = item.text.split(/\s+/).filter(Boolean);
+      let hint = "";
+      if (words.length > 1) {
+        hint = `${words[0]} ${words.slice(1).map(wordMask).join(" ")}`;
+      } else {
+        hint = wordMask(words[0], true);
+      }
+      setFeedback("hint", `提示：${hint}`);
+      els.answerInput.focus();
+    }
+
+    function wordMask(word, keepFirstLetter = false) {
+      if (!word) return "";
+      const plain = word.replace(/[A-Za-z]/g, "_");
+      if (!keepFirstLetter) return plain;
+      return word[0] + plain.slice(1);
+    }
+
+    function showAnswer() {
+      const item = currentItem();
+      if (!item) return;
+      els.answerInput.value = item.text;
+      setFeedback("hint", `答案：${item.text}`);
+      if (!answered) {
+        roundStats.wrong += 1;
+        wrongIds.add(item.id);
+        saveWrongIds();
+        answered = true;
+        updateStats();
+      }
+    }
+
+    function nextItem() {
+      if (!queue.length) return;
+      currentIndex += 1;
+      if (currentIndex >= queue.length) {
+        finishRound();
+        return;
+      }
+      renderCurrent();
+      if (els.autoSpeak.checked) {
+        setTimeout(() => speak(currentItem().text), 160);
+      }
+    }
+
+    function finishRound() {
+      els.unitLine.textContent = "本轮完成";
+      els.meaningText.textContent = `正确 ${roundStats.right}，错题 ${roundStats.wrong}`;
+      els.typeChip.textContent = "完成";
+      setDisabled(true);
+      els.nextBtn.disabled = true;
+      setFeedback(roundStats.wrong ? "hint" : "correct", roundStats.wrong ? "可以把顺序切到“只练错题”，再来一轮。" : "这一轮全对。");
+      updateStats();
+    }
+
+    function updateStats() {
+      const done = currentIndex < 0 ? 0 : Math.min(currentIndex, queue.length);
+      const activeDone = answered && currentIndex >= 0 && currentIndex < queue.length ? done + 1 : done;
+      els.doneCount.textContent = String(Math.min(activeDone, queue.length));
+      els.rightCount.textContent = String(roundStats.right);
+      els.wrongCount.textContent = String(roundStats.wrong);
+      els.leftCount.textContent = String(Math.max(queue.length - Math.min(activeDone, queue.length), 0));
+    }
+
+    function speak(text) {
+      if (!text) return;
+      if (!("speechSynthesis" in window)) {
+        setFeedback("wrong", "这个浏览器不支持 text-to-speech。请用 Chrome、Edge 或 Safari 打开。");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 0.82;
+      utterance.pitch = 1;
+      const chosen = voices.find((voice) => voice.name === els.voiceSelect.value);
+      if (chosen) {
+        utterance.voice = chosen;
+        utterance.lang = chosen.lang || "en-US";
+      }
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function loadVoices() {
+      if (!("speechSynthesis" in window)) {
+        els.voiceSelect.innerHTML = `<option>浏览器不支持</option>`;
+        return;
+      }
+      voices = window.speechSynthesis.getVoices()
+        .filter((voice) => /^en[-_]/i.test(voice.lang))
+        .sort((a, b) => a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name));
+
+      if (!voices.length) {
+        els.voiceSelect.innerHTML = `<option value="">默认英文发音</option>`;
+        return;
+      }
+
+      const preferred = voices.find((voice) => /us|samantha|alex|google/i.test(`${voice.lang} ${voice.name}`)) || voices[0];
+      els.voiceSelect.innerHTML = voices.map((voice) => (
+        `<option value="${escapeAttr(voice.name)}">${escapeHtml(voice.name)} · ${escapeHtml(voice.lang)}</option>`
+      )).join("");
+      els.voiceSelect.value = preferred.name;
+    }
+
+    function addSingle() {
+      const text = els.newEnglish.value.trim();
+      const cn = els.newChinese.value.trim();
+      if (!text) {
+        setFeedback("wrong", "请先填写英文。");
+        els.newEnglish.focus();
+        return;
+      }
+      addItems([{ text, cn, unit: els.newUnit.value.trim() || "我的词表", type: els.newType.value }]);
+      els.newEnglish.value = "";
+      els.newChinese.value = "";
+      els.newEnglish.focus();
+    }
+
+    function addBulk() {
+      const lines = els.bulkInput.value.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+      const parsed = lines.map(parseLine).filter(Boolean);
+      if (!parsed.length) {
+        setFeedback("wrong", "没有读到可导入的行。请用 “英文 = 中文” 的格式。");
+        return;
+      }
+      addItems(parsed);
+      els.bulkInput.value = "";
+    }
+
+    function parseLine(line) {
+      const match = line.match(/^(.+?)(?:\s*=\s*|\s+-\s+)(.+)$/);
+      if (!match) return null;
+      const text = match[1].trim();
+      const cn = match[2].trim();
+      if (!text) return null;
+      return {
+        text,
+        cn,
+        unit: "我的词表",
+        type: /\s/.test(text) ? "phrase" : "word"
+      };
+    }
+
+    function addItems(newItems) {
+      const prepared = newItems.map((item) => ({
+        id: makeId(item.text),
+        unit: item.unit || "我的词表",
+        type: item.type || (/\s/.test(item.text) ? "phrase" : "word"),
+        text: item.text,
+        cn: item.cn || ""
+      }));
+      const existing = new Set(items.map((item) => normalize(item.text)));
+      const unique = prepared.filter((item) => !existing.has(normalize(item.text)));
+      if (!unique.length) {
+        setFeedback("hint", "这些内容已经在词表里。");
+        return;
+      }
+      items = [...items, ...unique];
+      saveItems();
+      setFeedback("correct", `已添加 ${unique.length} 条。`);
+      startRound();
+    }
+
+    function resetBuiltins() {
+      const custom = items.filter((item) => !builtInItems.some((base) => base.id === item.id));
+      items = [...builtInItems, ...custom];
+      saveItems();
+      setFeedback("correct", "已恢复内置内容，手动添加的内容仍然保留。");
+      startRound();
+    }
+
+    function exportItems() {
+      const lines = items.map((item) => `${item.text} = ${item.cn || ""}`).join("\n");
+      const blob = new Blob([lines], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "jo-dictation-word-list.txt";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function normalize(value) {
+      let text = String(value || "").toLowerCase().trim();
+      text = text.replace(/[’]/g, "'");
+      text = text.replace(/\s+/g, " ");
+      if (!els.strictMode.checked) {
+        text = text.replace(/[^a-z0-9\s]/g, "");
+      }
+      return text;
+    }
+
+    function shuffle(list) {
+      const copy = list.slice();
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function makeId(text) {
+      const base = normalize(text).replace(/\s+/g, "-") || "item";
+      let id = `custom-${base}`;
+      let n = 2;
+      const existing = new Set(items.map((item) => item.id));
+      while (existing.has(id)) {
+        id = `custom-${base}-${n}`;
+        n += 1;
+      }
+      return id;
+    }
+
+    function clearFeedback() {
+      els.feedback.className = "feedback";
+      els.feedback.innerHTML = `提示：按 <span class="kbd">Enter</span> 检查；按 <span class="kbd">⌘/Ctrl + Enter</span> 播放发音。`;
+    }
+
+    function setFeedback(type, html) {
+      els.feedback.className = `feedback ${type}`;
+      els.feedback.textContent = html;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+  </script>
+</body>
+</html>
