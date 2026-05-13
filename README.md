@@ -7,6 +7,11 @@
 - 英文单词和短语听写
 - 浏览器 text-to-speech 发音
 - 中文提示、首词提示、对错判断
-- 第四单元 `Unit 4 Fashion` 可单独考核
+- 内置 `8B Unit 1` 到 `8B Unit 6`，顺序按 docx 文档排列
 - 支持手动添加和批量导入词组
 
+更新内置词库：
+
+```bash
+python3 tools/import_docx_vocab.py --source /path/to/jo-diction --html index.html
+```
