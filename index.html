@@ -6850,6 +6850,7 @@ take place = 发生"></textarea>
 
     function init() {
       renderFilters();
+      applyInitialParams();
       renderList();
       loadVoices();
       bindEvents();
@@ -6949,6 +6950,23 @@ take place = 发生"></textarea>
       els.unitFilter.innerHTML = options.join("");
       if ([...els.unitFilter.options].some((option) => option.value === selected)) {
         els.unitFilter.value = selected;
+      }
+    }
+
+    function applyInitialParams() {
+      const params = new URLSearchParams(window.location.search);
+      const unit = params.get("unit");
+      const section = params.get("section");
+      const scope = params.get("scope") || (unit
+        ? (section ? `section|${unit}|${section}` : `unit|${unit}`)
+        : "");
+      const order = params.get("order");
+
+      if (scope && [...els.unitFilter.options].some((option) => option.value === scope)) {
+        els.unitFilter.value = scope;
+      }
+      if (order && [...els.orderMode.options].some((option) => option.value === order)) {
+        els.orderMode.value = order;
       }
     }
 
