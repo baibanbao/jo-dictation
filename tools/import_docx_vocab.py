@@ -46,6 +46,7 @@ def main() -> int:
             {
                 "id": item_id,
                 "unit": item["unit"],
+                "section": item["section"],
                 "type": "phrase" if re.search(r"\s", item["text"]) else "word",
                 "text": item["text"],
                 "cn": cn.strip() or item["text"],
