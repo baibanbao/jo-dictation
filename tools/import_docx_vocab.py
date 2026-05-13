@@ -93,6 +93,7 @@ def extract_items(source: Path) -> list[dict[str, str]]:
 def clean_english(value: str) -> str:
     value = BRACKET_RE.sub("", value)
     value = value.replace("\u00a0", " ")
+    value = value.replace("`", "")
     value = value.replace("’", "'").replace("“", '"').replace("”", '"')
     value = re.sub(r"\s+", " ", value).strip()
     return value
