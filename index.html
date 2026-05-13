@@ -6811,6 +6811,8 @@ take place = 发生"></textarea>
     let answered = false;
     let roundStats = { right: 0, wrong: 0 };
     let voices = [];
+    let initialLimit = 0;
+    let initialLimitScope = "";
 
     const els = {
       unitFilter: document.querySelector("#unitFilter"),
@@ -6961,9 +6963,14 @@ take place = 发生"></textarea>
         ? (section ? `section|${unit}|${section}` : `unit|${unit}`)
         : "");
       const order = params.get("order");
+      const limit = Number.parseInt(params.get("limit") || "", 10);
 
       if (scope && [...els.unitFilter.options].some((option) => option.value === scope)) {
         els.unitFilter.value = scope;
+        if (Number.isInteger(limit) && limit > 0) {
+          initialLimit = limit;
+          initialLimitScope = scope;
+        }
       }
       if (order && [...els.orderMode.options].some((option) => option.value === order)) {
         els.orderMode.value = order;
@@ -7025,6 +7032,9 @@ take place = 发生"></textarea>
 
       if (mode === "wrongOnly") {
         selected = selected.filter((item) => wrongIds.has(item.id));
+      }
+      if (initialLimit && scope === initialLimitScope) {
+        selected = selected.slice(0, initialLimit);
       }
       if (mode === "shuffle") {
         selected = shuffle(selected);

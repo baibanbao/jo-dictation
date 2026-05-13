@@ -14,10 +14,12 @@
 URL 参数：
 
 - `?unit=8B%20Unit%204%20Fashion&section=A&order=inOrder`：直接打开 Unit 4 A，按文档顺序
+- `?unit=8B%20Unit%204%20Fashion&section=A&order=inOrder&limit=12`：直接打开 Unit 4 A 的前 12 条
 - `?unit=8B%20Unit%204%20Fashion&section=C&order=shuffle`：直接打开 Unit 4 C，打乱顺序
 - `?unit=8B%20Unit%204%20Fashion&order=wrongOnly`：直接打开 Unit 4 全单元错题
 
 `order` 可选：`inOrder`、`shuffle`、`wrongOnly`。
+`limit` 可选：正整数，用来限制当前范围的前 N 条，适合短测或能力校准。
 
 更新内置词库：
 
