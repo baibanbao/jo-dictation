@@ -567,6 +567,8 @@
             <button class="btn primary" id="checkBtn" type="button">检查</button>
             <button class="btn light" id="hintBtn" type="button">提示第一个词</button>
             <button class="btn light" id="showBtn" type="button">看答案</button>
+            <button class="btn light" id="editCnBtn" type="button">修改译文</button>
+            <button class="btn light" id="prevBtn" type="button">上一题</button>
             <button class="btn blue" id="nextBtn" type="button">下一题</button>
           </div>
           <div class="feedback" id="feedback">提示：按 <span class="kbd">Enter</span> 检查；按 <span class="kbd">⌘/Ctrl + Enter</span> 播放发音。</div>
@@ -632,6 +634,7 @@ take place = 发生"></textarea>
     const STORAGE_KEY = "joDictationItems.v2";
     const LEGACY_STORAGE_KEY = "joDictationItems.v1";
     const WRONG_KEY = "joDictationWrongIds.v1";
+    const TRANSLATION_OVERRIDES_KEY = "joDictationTranslationOverrides.v1";
 
     const builtInItems = [
           {
@@ -5020,11 +5023,16 @@ take place = 发生"></textarea>
           }
     ];
 
+    let translationOverrides = readJson(TRANSLATION_OVERRIDES_KEY, {});
+    if (!translationOverrides || Array.isArray(translationOverrides) || typeof translationOverrides !== "object") {
+      translationOverrides = {};
+    }
     let items = loadItems();
     let wrongIds = new Set(readJson(WRONG_KEY, []));
     let queue = [];
     let currentIndex = -1;
     let answered = false;
+    let answerStates = new Map();
     let roundStats = { right: 0, wrong: 0 };
     let voices = [];
     let initialStart = 0;
@@ -5049,6 +5057,8 @@ take place = 发生"></textarea>
       checkBtn: document.querySelector("#checkBtn"),
       hintBtn: document.querySelector("#hintBtn"),
       showBtn: document.querySelector("#showBtn"),
+      editCnBtn: document.querySelector("#editCnBtn"),
+      prevBtn: document.querySelector("#prevBtn"),
       nextBtn: document.querySelector("#nextBtn"),
       feedback: document.querySelector("#feedback"),
       showChinese: document.querySelector("#showChinese"),
@@ -5084,6 +5094,8 @@ take place = 发生"></textarea>
       els.checkBtn.addEventListener("click", checkAnswer);
       els.hintBtn.addEventListener("click", showHint);
       els.showBtn.addEventListener("click", showAnswer);
+      els.editCnBtn.addEventListener("click", editCurrentTranslation);
+      els.prevBtn.addEventListener("click", previousItem);
       els.nextBtn.addEventListener("click", nextItem);
       els.showChinese.addEventListener("change", renderCurrent);
       els.addBtn.addEventListener("click", addSingle);
@@ -5120,9 +5132,13 @@ take place = 发生"></textarea>
     }
 
     function mergeWithBuiltIns(saved) {
-      const builtInById = new Map(builtInItems.map((item) => [item.id, item]));
+      const mergedBuiltIns = builtInItems.map((item) => {
+        const override = translationOverrides[item.id];
+        return override?.cn ? { ...item, cn: override.cn } : item;
+      });
+      const builtInById = new Map(mergedBuiltIns.map((item) => [item.id, item]));
       const custom = saved.filter((item) => item?.text && String(item.id || "").startsWith("custom-") && !builtInById.has(item.id));
-      return [...builtInItems, ...custom];
+      return [...mergedBuiltIns, ...custom];
     }
 
     function readJson(key, fallback) {
@@ -5142,6 +5158,10 @@ take place = 发生"></textarea>
 
     function saveWrongIds() {
       localStorage.setItem(WRONG_KEY, JSON.stringify([...wrongIds]));
+    }
+
+    function saveTranslationOverrides() {
+      localStorage.setItem(TRANSLATION_OVERRIDES_KEY, JSON.stringify(translationOverrides));
     }
 
     function renderFilters() {
@@ -5264,6 +5284,7 @@ take place = 发生"></textarea>
 
       queue = selected;
       currentIndex = queue.length ? 0 : -1;
+      answerStates = new Map();
       answered = false;
       roundStats = { right: 0, wrong: 0 };
       renderCurrent();
@@ -5277,10 +5298,16 @@ take place = 发生"></textarea>
       return queue[currentIndex] || null;
     }
 
+    function currentAnswerState() {
+      const item = currentItem();
+      return item ? answerStates.get(item.id) : null;
+    }
+
     function renderCurrent() {
       const item = currentItem();
-      els.answerInput.value = "";
-      answered = false;
+      const state = currentAnswerState();
+      els.answerInput.value = state?.input || "";
+      answered = Boolean(state);
       clearFeedback();
 
       if (!item) {
@@ -5296,14 +5323,48 @@ take place = 发生"></textarea>
       els.unitLine.textContent = `${itemScope(item)} · 第 ${currentIndex + 1} / ${queue.length} 题`;
       els.meaningText.textContent = els.showChinese.checked ? (item.cn || "听发音写英文") : "听发音写英文";
       els.typeChip.textContent = item.type === "phrase" ? "短语" : "单词";
+      updateNavButtons();
+      if (state) {
+        if (state.status === "right") {
+          setFeedback("correct", `已答对：${item.text}`);
+        } else {
+          setFeedback("hint", state.revealed ? `已看答案：${item.text}` : `已记录为错题。正确答案：${item.text}`);
+        }
+      }
       els.answerInput.focus();
       updateStats();
     }
 
     function setDisabled(disabled) {
-      [els.answerInput, els.speakBtn, els.checkBtn, els.hintBtn, els.showBtn, els.nextBtn].forEach((el) => {
+      [els.answerInput, els.speakBtn, els.checkBtn, els.hintBtn, els.showBtn, els.editCnBtn, els.prevBtn, els.nextBtn].forEach((el) => {
         el.disabled = disabled;
       });
+      if (!disabled) {
+        updateNavButtons();
+      }
+    }
+
+    function updateNavButtons() {
+      els.prevBtn.disabled = !queue.length || currentIndex <= 0;
+      els.nextBtn.disabled = !queue.length || currentIndex < 0;
+    }
+
+    function setAnswerState(item, status, input, revealed = false) {
+      const previous = answerStates.get(item.id);
+      const finalStatus = previous?.status === "wrong" ? "wrong" : status;
+      answerStates.set(item.id, {
+        status: finalStatus,
+        input,
+        revealed: Boolean(previous?.revealed || revealed)
+      });
+      if (finalStatus === "right") {
+        wrongIds.delete(item.id);
+      } else {
+        wrongIds.add(item.id);
+      }
+      saveWrongIds();
+      answered = true;
+      updateStats();
     }
 
     function checkAnswer() {
@@ -5321,21 +5382,11 @@ take place = 发生"></textarea>
 
       if (ok) {
         setFeedback("correct", `对了：${item.text}`);
-        if (!answered) {
-          roundStats.right += 1;
-          wrongIds.delete(item.id);
-          saveWrongIds();
-        }
+        setAnswerState(item, "right", input.trim());
       } else {
         setFeedback("wrong", `还不对。你写的是 “${input.trim()}”。再听一遍，或看第一个词提示。`);
-        if (!answered) {
-          roundStats.wrong += 1;
-          wrongIds.add(item.id);
-          saveWrongIds();
-        }
+        setAnswerState(item, "wrong", input.trim());
       }
-      answered = true;
-      updateStats();
     }
 
     function showHint() {
@@ -5364,13 +5415,42 @@ take place = 发生"></textarea>
       if (!item) return;
       els.answerInput.value = item.text;
       setFeedback("hint", `答案：${item.text}`);
-      if (!answered) {
-        roundStats.wrong += 1;
-        wrongIds.add(item.id);
-        saveWrongIds();
-        answered = true;
-        updateStats();
+      setAnswerState(item, "wrong", item.text, true);
+    }
+
+    function editCurrentTranslation() {
+      const item = currentItem();
+      if (!item) return;
+      const next = window.prompt("修改中文译文", item.cn || "");
+      if (next === null) return;
+      const cn = next.trim();
+      if (!cn) {
+        setFeedback("wrong", "中文译文不能为空。");
+        return;
       }
+      item.cn = cn;
+      if (String(item.id || "").startsWith("custom-")) {
+        saveItems();
+      } else {
+        translationOverrides[item.id] = { cn };
+        saveTranslationOverrides();
+        renderList();
+      }
+      renderCurrent();
+      setFeedback("correct", "中文译文已保存到本机浏览器。");
+    }
+
+    function previousItem() {
+      if (!queue.length) return;
+      if (currentIndex > queue.length - 1) {
+        currentIndex = queue.length - 1;
+      } else {
+        currentIndex -= 1;
+      }
+      if (currentIndex < 0) {
+        currentIndex = 0;
+      }
+      renderCurrent();
     }
 
     function nextItem() {
@@ -5391,18 +5471,22 @@ take place = 发生"></textarea>
       els.meaningText.textContent = `正确 ${roundStats.right}，错题 ${roundStats.wrong}`;
       els.typeChip.textContent = "完成";
       setDisabled(true);
+      els.prevBtn.disabled = !queue.length;
       els.nextBtn.disabled = true;
       setFeedback(roundStats.wrong ? "hint" : "correct", roundStats.wrong ? "可以把顺序切到“只练错题”，再来一轮。" : "这一轮全对。");
       updateStats();
     }
 
     function updateStats() {
-      const done = currentIndex < 0 ? 0 : Math.min(currentIndex, queue.length);
-      const activeDone = answered && currentIndex >= 0 && currentIndex < queue.length ? done + 1 : done;
-      els.doneCount.textContent = String(Math.min(activeDone, queue.length));
+      roundStats = [...answerStates.values()].reduce((stats, state) => {
+        stats[state.status === "right" ? "right" : "wrong"] += 1;
+        return stats;
+      }, { right: 0, wrong: 0 });
+      const done = Math.min(answerStates.size, queue.length);
+      els.doneCount.textContent = String(done);
       els.rightCount.textContent = String(roundStats.right);
       els.wrongCount.textContent = String(roundStats.wrong);
-      els.leftCount.textContent = String(Math.max(queue.length - Math.min(activeDone, queue.length), 0));
+      els.leftCount.textContent = String(Math.max(queue.length - done, 0));
     }
 
     function speak(text) {
